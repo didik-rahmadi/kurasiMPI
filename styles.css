@@ -1,0 +1,98 @@
+body { 
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; 
+  margin: 20px auto; 
+  max-width: 800px;
+  background-color: #f8fafc;
+  color: #334155;
+  padding: 0 15px;
+}
+
+/* HEADER */
+header {
+  background: white;
+  text-align: center;
+  margin-bottom: 25px;
+  padding: 25px 20px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border: 1px solid #e2e8f0;
+}
+
+.logo-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.logo-group img { height: 45px; }
+#logoHeader { height: 55px; }
+
+h1 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 4px 0;
+}
+
+.sub-header-line {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 2px 0;
+}
+
+.muted {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+
+/* CONTROLS */
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #f1f5f9;
+}
+
+@media (min-width: 600px) {
+  .controls { flex-direction: row; align-items: center; }
+  .controls select { flex: 1; }
+}
+
+/* BUTTON */
+.btn {
+  padding: 10px 20px;
+  border-radius: 6px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: #3b82f6;
+  color: white;
+}
+
+/* CARD */
+.card {
+  background: white;
+  border-top: 4px solid #3b82f6;
+  padding: 25px;
+  margin-top: 25px;
+  border-radius: 8px;
+}
+
+/* CONTENT LIST */
+.content-item {
+  cursor: pointer;
+  padding: 15px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
