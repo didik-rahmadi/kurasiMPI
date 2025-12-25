@@ -2,35 +2,28 @@
    VARIABLES & THEME
 ========================= */
 :root {
-  /* Color Palette - Professional Blue Theme */
-  --primary: #2563eb;       /* Biru Utama */
+  --primary: #2563eb;       
   --primary-hover: #1d4ed8;
-  --bg-body: #f3f4f6;       /* Abu-abu sangat muda untuk background */
+  --bg-body: #f3f4f6;       
   --bg-card: #ffffff;
-  --text-main: #1f2937;     /* Hampir hitam */
-  --text-muted: #6b7280;    /* Abu-abu teks */
-  --border-color: #e5e7eb;  /* Abu-abu border halus */
-  
-  /* Status Colors */
+  --text-main: #1f2937;     
+  --text-muted: #6b7280;    
+  --border-color: #e5e7eb;  
   --success: #10b981;
   --warning-bg: #fff7ed;
   --warning-border: #fdba74;
-  
-  /* Spacing & Sizing */
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --font-base: "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 /* =========================
    RESET & BASE
 ========================= */
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -39,16 +32,12 @@ body {
   background: var(--bg-body);
   color: var(--text-main);
   line-height: 1.6;
-  -webkit-font-smoothing: antialiased; /* Font lebih tajam di Mac/iOS */
 }
 
-.hidden {
-  display: none !important;
-}
+.hidden { display: none !important; }
 
-/* Wrapper untuk membatasi lebar konten agar rapi di layar besar */
 .container {
-  max-width: 1000px; /* Sedikit diperkecil agar lebih fokus */
+  max-width: 1000px;
   margin: 0 auto;
 }
 
@@ -75,7 +64,7 @@ header {
 }
 
 .logo-group img {
-  height: 48px; /* Sedikit diperbesar */
+  height: 48px;
   object-fit: contain;
 }
 
@@ -84,17 +73,23 @@ header h1 {
   font-size: 24px;
   font-weight: 800;
   color: #111827;
-  letter-spacing: -0.025em;
 }
 
 .sub-header-line {
   font-size: 15px;
   color: var(--text-muted);
   font-weight: 500;
+  margin: 2px 0;
+}
+
+.muted {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-top: 10px;
 }
 
 /* =========================
-   CONTROLS (FILTERS)
+   CONTROLS
 ========================= */
 .controls {
   margin-top: 24px;
@@ -106,7 +101,6 @@ header h1 {
   flex-wrap: wrap;
 }
 
-/* Input & Select Styling Modern */
 select, input[type="text"], textarea {
   padding: 10px 14px;
   border-radius: var(--radius-sm);
@@ -114,17 +108,17 @@ select, input[type="text"], textarea {
   background: #fff;
   font-size: 14px;
   color: var(--text-main);
-  transition: all 0.2s;
+  min-width: 200px;
 }
 
-select:focus, input:focus, textarea:focus {
+select:focus, textarea:focus {
   outline: none;
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 /* =========================
-   BUTTONS
+   BUTTONS & LINKS
 ========================= */
 .btn {
   display: inline-flex;
@@ -140,47 +134,35 @@ select:focus, input:focus, textarea:focus {
   text-decoration: none;
 }
 
-.btn-primary {
-  background: var(--primary);
-  color: #ffffff;
-  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
-}
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
 
-.btn-primary:hover {
-  background: var(--primary-hover);
-  transform: translateY(-1px);
-}
+.btn-secondary { background: #fff; color: var(--text-main); border: 1px solid var(--border-color); }
+.btn-secondary:hover { background: #f9fafb; }
 
-.btn-secondary {
-  background: #ffffff;
-  color: var(--text-main);
-  border: 1px solid var(--border-color);
-}
+.btn-success { background: var(--success); color: #fff; }
+.btn-success:hover { background: #059669; }
 
-.btn-secondary:hover {
-  background: #f9fafb;
-  border-color: #d1d5db;
-}
+.btn-small { padding: 6px 12px; font-size: 12px; }
 
-.btn-success {
-  background: var(--success);
-  color: #ffffff;
-}
-
-.btn-success:hover {
-  background: #059669;
-}
-
-button[disabled], .btn-disabled {
+button[disabled] {
   background: #e5e7eb !important;
   color: #9ca3af !important;
   cursor: not-allowed;
   transform: none !important;
-  box-shadow: none !important;
 }
 
+/* Link Fix */
+a, a[target="_blank"] {
+  cursor: pointer !important;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+a:hover { text-decoration: underline; }
+
 /* =========================
-   CARDS & PANELS
+   CARDS & TABLES
 ========================= */
 .card {
   background: var(--bg-card);
@@ -191,40 +173,13 @@ button[disabled], .btn-disabled {
   margin-bottom: 24px;
 }
 
-/* Top Meta (Info Kurator) */
-.top-meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.tag {
-  background: #eff6ff;
-  color: var(--primary);
-  padding: 6px 12px;
-  border-radius: 50px;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-/* =========================
-   TABLE STYLING
-========================= */
-.table-responsive {
-  overflow-x: auto;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-color);
-}
+.table-responsive { overflow-x: auto; }
 
 table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
-  background: white;
+  margin-top: 10px;
 }
 
 thead th {
@@ -235,133 +190,87 @@ thead th {
   font-weight: 700;
   letter-spacing: 0.05em;
   padding: 12px 16px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 2px solid var(--border-color);
   text-align: left;
 }
 
 tbody td {
   padding: 12px 16px;
   border-bottom: 1px solid var(--border-color);
-  color: var(--text-main);
   vertical-align: middle;
 }
 
-tbody tr:last-child td {
-  border-bottom: none;
-}
-
-tbody tr:hover {
-  background: #f9fafb;
-}
-
-/* Download Link Style */
-a[target="_blank"] {
-  color: var(--primary);
-  text-decoration: none;
-  font-weight: 500;
-}
-a[target="_blank"]:hover {
-  text-decoration: underline;
-}
+tbody tr:hover { background: #f9fafb; }
 
 /* =========================
-   FORM KURASI (RE-DESIGNED)
+   FORM KURASI & CONTENT LIST
 ========================= */
-.kurasi-header {
-  text-align: center;
-  font-size: 20px;
-  font-weight: 700;
-  color: #1e3a8a;
-  margin-bottom: 8px;
-}
-
-.kurasi-subheader {
-  text-align: center;
-  font-size: 14px;
-  color: var(--text-muted);
-  margin-bottom: 24px;
-}
-
-#kurasiPanel {
-  /* Panel utama sekarang background putih bersih di dalam card */
-  background: transparent; 
-}
-
-/* Setiap item pertanyaan kita buat jadi block terpisah yg rapi */
 .question-block {
-  background: #f8fafc; /* Abu kebiruan sangat muda */
+  background: #f8fafc;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  padding: 16px;
+  padding: 20px;
   margin-bottom: 20px;
 }
 
-/* Label Pertanyaan (Paragraph di dalam question-block) */
-/* Asumsi HTML Anda: <p><b>Pertanyaan?</b></p> */
-#kurasiPanel p { 
-  margin: 0 0 10px 0;
-  color: var(--text-main);
-  font-size: 15px;
-  line-height: 1.5;
-}
-
-#kurasiPanel p b {
+.question-block p {
+  margin: 0 0 12px 0;
   font-weight: 600;
+  color: var(--text-main);
 }
 
-/* Select dan Textarea di dalam kurasi */
-#kurasiPanel select, 
-#kurasiPanel textarea {
+.question-block select, 
+.question-block textarea {
   width: 100%;
   margin-bottom: 10px;
-  background: #ffffff;
-  border-color: #cbd5e1;
+  display: block;
 }
 
-#kurasiPanel select {
-  height: 42px; /* Tinggi yang nyaman untuk touch */
-}
-
-#kurasiPanel textarea {
-  min-height: 80px;
-  resize: vertical;
-}
-
-/* Khusus Komentar Umum */
 textarea#komentar {
+  width: 100%;
   background: var(--warning-bg);
-  border: 1px solid var(--warning-border);
-  color: #9a3412;
-  font-weight: 500;
+  border-color: var(--warning-border);
 }
 
-textarea#komentar::placeholder {
-  color: #c2410c;
-  opacity: 0.6;
+.content-item {
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 12px;
+  cursor: pointer !important; /* Fix cursor */
+  transition: all 0.2s;
 }
 
-hr {
-  border: none;
-  height: 1px;
-  background: var(--border-color);
-  margin: 30px 0;
+.content-item:hover {
+  border-color: var(--primary);
+  background: #eff6ff;
+  transform: translateY(-2px);
 }
 
-/* Mobile Responsiveness */
+.detail-answer-block {
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px dashed var(--border-color);
+}
+.detail-answer-block:last-child { border-bottom: none; }
+
+/* =========================
+   LOADING SPINNER
+========================= */
+.loader {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid var(--primary);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin: 20px auto;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* Mobile */
 @media (max-width: 600px) {
-  header, .card {
-    padding: 20px 16px;
-  }
-  
-  .controls {
-    flex-direction: column;
-  }
-  
-  select, .btn {
-    width: 100%;
-  }
-  
-  .logo-group img {
-    height: 36px;
-  }
+  .controls { flex-direction: column; }
+  select, .btn { width: 100%; }
 }
