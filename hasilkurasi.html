@@ -24,7 +24,7 @@
 
     <div class="controls">
       <select id="creator">
-        <option value="">-- Memuat Daftar Kurator --</option>
+        <option value="">-- Memuat Daftar Pengembang --</option>
       </select>
       <button class="btn btn-primary" onclick="loadContents()">Tampilkan</button>
       <button class="btn btn-secondary" onclick="location.href='index.html'">Kembali ke Form</button>
@@ -32,7 +32,7 @@
   </header>
 
   <div id="contentList" class="card">
-    <div class="muted" style="text-align:center">Pilih nama kurator di atas untuk melihat hasil.</div>
+    <div class="muted" style="text-align:center">Pilih nama pengembang di atas untuk melihat hasil.</div>
   </div>
 
   <div id="detail" class="card hidden"></div>
@@ -51,7 +51,7 @@ function loadCreators(){
     .then(r=>r.json())
     .then(d=>{
       const sel = document.getElementById('creator');
-      sel.innerHTML='<option value="">-- Pilih Kurator --</option>';
+      sel.innerHTML='<option value="">-- Pilih Pengembang --</option>';
       d.forEach(n => sel.innerHTML+=`<option>${esc(n)}</option>`);
     });
 }
