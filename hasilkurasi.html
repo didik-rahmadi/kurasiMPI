@@ -9,39 +9,50 @@
 
 <body>
 
-<header>
-  <div class="logo-group">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Logo_of_Ministry_of_Education_and_Culture_of_Republic_of_Indonesia.svg/1200px-Logo_of_Ministry_of_Education_and_Culture_of_Republic_of_Indonesia.svg.png" id="logoHeader">
-    <img src="https://trigger.id/wp-content/uploads/2025/05/pendidikan-1024x452.png">
-    <img src="https://kemendikdasmen.go.id/kem_base/static/src/img/ramah.png">
-    <img src="https://cdn-sdotid.adg.id/images/70b5e75c-f103-4e51-9b76-432a91d07494_980x382.png">
+<div class="container">
+  <header>
+    <div class="logo-group">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Logo_of_Ministry_of_Education_and_Culture_of_Republic_of_Indonesia.svg/1200px-Logo_of_Ministry_of_Education_and_Culture_of_Republic_of_Indonesia.svg.png">
+      <img src="https://trigger.id/wp-content/uploads/2025/05/pendidikan-1024x452.png">
+      <img src="https://kemendikdasmen.go.id/kem_base/static/src/img/ramah.png">
+      <img src="https://cdn-sdotid.adg.id/images/70b5e75c-f103-4e51-9b76-432a91d07494_980x382.png">
+    </div>
+
+    <h1>Rekap Hasil Kurasi</h1>
+    <h2 class="sub-header-line">Direktorat Sekolah Dasar</h2>
+    <div class="muted">Lihat hasil penilaian dari para kurator.</div>
+
+    <div class="controls">
+      <select id="creator">
+        <option value="">-- Memuat Daftar Kurator --</option>
+      </select>
+      <button class="btn btn-primary" onclick="loadContents()">Tampilkan</button>
+      <button class="btn btn-secondary" onclick="location.href='index.html'">Kembali ke Form</button>
+    </div>
+  </header>
+
+  <div id="contentList" class="card">
+    <div class="muted" style="text-align:center">Pilih nama kurator di atas untuk melihat hasil.</div>
   </div>
 
-  <h1>Kurasi Media Pembelajaran Interaktif Jilid 2</h1>
-  <h1>Direktorat Sekolah Dasar</h1>
-  <h2 class="sub-header-line">Direktorat Jenderal PAUD, Dikdas, dan Dikmen</h2>
-  <h2 class="sub-header-line">Kementerian Pendidikan Dasar dan Menengah</h2>
-  <div class="muted">Pilih kreator untuk melihat hasil kurasi.</div>
-
-  <div class="controls">
-    <select id="creator"></select>
-    <button class="btn btn-primary" onclick="loadContents()">Lihat Hasil Kurasi</button>
-    <button class="btn btn-secondary" onclick="location.href='index.html'">Kembali ke Halaman Kurasi</button>
-  </div>
-</header>
-
-<div id="contentList" class="card"></div>
-<div id="detail" class="card"></div>
+  <div id="detail" class="card hidden"></div>
+</div>
 
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbx__Yig33QCnywBPzOU-oD899gdjJL1OWoca7ajKIOsRpvbjx1NZZoDsBd3ZjC42pmi/exec";
+
+/* Escaper Utility */
+function esc(s){
+  return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
 
 function loadCreators(){
   fetch(API_URL+'?action=creators')
     .then(r=>r.json())
     .then(d=>{
-      creator.innerHTML='<option value=""></option>';
-      d.forEach(n=>creator.innerHTML+=`<option>${n}</option>`);
+      const sel = document.getElementById('creator');
+      sel.innerHTML='<option value="">-- Pilih Kurator --</option>';
+      d.forEach(n => sel.innerHTML+=`<option>${esc(n)}</option>`);
     });
 }
 
@@ -54,30 +65,36 @@ function loadContents() {
 
   const listDiv = document.getElementById('contentList');
   const detailDiv = document.getElementById('detail');
-
-  listDiv.innerHTML = 'Memuat hasil kurasi...';
+  
   detailDiv.innerHTML = '';
+  detailDiv.classList.add('hidden');
+  listDiv.innerHTML = '<div class="loader"></div><div style="text-align:center">Mengambil data...</div>';
 
   fetch(API_URL + '?action=hasil&kurator=' + encodeURIComponent(creator))
     .then(r => r.json())
     .then(data => {
       if (!data.rows || data.rows.length === 0) {
-        listDiv.innerHTML = '<div class="muted">Belum ada hasil kurasi.</div>';
+        listDiv.innerHTML = '<div class="muted" style="text-align:center">Belum ada hasil kurasi dari kurator ini.</div>';
         return;
       }
 
+      // Render List
       listDiv.innerHTML = data.rows.map((r, i) => `
         <div class="content-item" onclick="loadDetail(${i})">
-          <b>${r[5]} - Fase ${r[4]} - ${r[6]}</b><br>
-          <small>Kurator: ${r[1]}</small>
+          <div style="font-weight:bold; font-size:16px; margin-bottom:4px;">${esc(r[6])}</div>
+          <div style="font-size:13px; color:#555;">
+             <span class="tag" style="background:#e0f2fe; color:#0284c7; padding:2px 8px; border-radius:4px;">Fase ${esc(r[4])}</span> 
+             &nbsp; ${esc(r[5])}
+          </div>
+          <small style="display:block; margin-top:6px; color:#888;">Pengembang: ${esc(r[3])}</small>
         </div>
       `).join('');
 
-      // simpan cache global untuk detail
+      // Simpan cache global
       window.__HASIL_CACHE__ = data;
     })
     .catch(err => {
-      listDiv.innerHTML = '<div class="muted">Gagal memuat data</div>';
+      listDiv.innerHTML = '<div class="muted">Gagal memuat data. Periksa koneksi internet.</div>';
       console.error(err);
     });
 }
@@ -89,31 +106,63 @@ function loadDetail(index) {
 
   const headers = data.headers;
   const row = data.rows[index];
+  const detailDiv = document.getElementById('detail');
 
   let html = `
-    <div class="card">
-      <p><b>Fase:</b> ${row[4]}</p>
-      <p><b>Mapel:</b> ${row[5]}</p>
-      <p><b>Judul:</b> ${row[6]}</p>
-      <p><b>Pengembang:</b> ${row[3]}</p>
-      <p><b>Kurator:</b> ${row[1]}</p>
-      <hr>
+    <h3 style="margin-top:0; border-bottom:1px solid #ddd; padding-bottom:10px;">Detail Kurasi</h3>
+    <table style="margin-bottom:20px;">
+      <tr><td width="120"><b>Judul</b></td><td>: ${esc(row[6])}</td></tr>
+      <tr><td><b>Pengembang</b></td><td>: ${esc(row[3])}</td></tr>
+      <tr><td><b>Fase / Mapel</b></td><td>: ${esc(row[4])} / ${esc(row[5])}</td></tr>
+      <tr><td><b>Kurator</b></td><td>: ${esc(row[1])}</td></tr>
+    </table>
+    
+    <div style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #e2e8f0;">
   `;
 
+  // Loop kolom pertanyaan (Asumsi: Kolom 7 sampai sebelum kolom terakhir adalah pertanyaan)
+  // Logic: Kolom Ganjil = Jawaban (Ya/Tidak), Kolom Genap = Catatan
   for (let i = 7; i < headers.length - 1; i += 2) {
+    const pertanyaaan = headers[i];
+    const jawaban = row[i];
+    const catatan = row[i+1];
+
+    // Warna badge jawaban
+    let badgeColor = (jawaban === 'Ya') ? 'background:#dcfce7; color:#166534;' : 'background:#fee2e2; color:#991b1b;';
+    if(!jawaban) badgeColor = 'background:#f3f4f6; color:#666;';
+
     html += `
-      <p><b>${headers[i]}</b></p>
-      <div class="jawaban">
-        <p>• ${row[i]}</p>
-        <p>• ${row[i + 1]}</p>
+      <div class="detail-answer-block">
+        <p style="margin-bottom:6px; font-weight:600; color:#334155;">${esc(pertanyaaan)}</p>
+        <div style="display:flex; gap:10px; align-items:flex-start;">
+           <span style="${badgeColor} padding:4px 10px; border-radius:6px; font-size:13px; font-weight:bold; min-width:60px; text-align:center;">
+             ${esc(jawaban) || '-'}
+           </span>
+           <span style="font-size:14px; color:#475569; font-style:italic;">
+             ${catatan ? 'Catatan: '+esc(catatan) : ''}
+           </span>
+        </div>
       </div>
     `;
   }
 
-  html += `<hr><p><b>Komentar:</b><br>${row[headers.length - 1]}</p></div>`;
-  document.getElementById('detail').innerHTML = html;
-}
+  // Komentar Akhir (Kolom Terakhir)
+  const komentarAkhir = row[headers.length - 1];
+  html += `</div>
+    <div style="margin-top:20px; background:#fff7ed; padding:15px; border-radius:8px; border:1px solid #fdba74;">
+      <b style="color:#9a3412;">Kesimpulan / Komentar Akhir:</b>
+      <p style="margin-top:5px;">${esc(komentarAkhir) || '-'}</p>
+    </div>
+    
+    <button class="btn btn-secondary" style="margin-top:20px; width:100%;" onclick="document.getElementById('detail').classList.add('hidden'); window.scrollTo(0,0);">
+      Tutup Detail
+    </button>
+  `;
 
+  detailDiv.innerHTML = html;
+  detailDiv.classList.remove('hidden');
+  detailDiv.scrollIntoView({ behavior: 'smooth' });
+}
 
 loadCreators();
 </script>
