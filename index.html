@@ -70,41 +70,69 @@ btnLoad.onclick = () => {
     .then(r=>r.json())
     .then(p=>{
       let h = `
-      <table>
-        <thead>
-          <tr>
-            <th>Download</th>
-            <th>#</th>
-            <th>Judul</th>
-            <th>Aksi</th>
-          </tr>
-        </thead><tbody>`;
+<table>
+  <thead>
+    <tr>
+      <th>No</th>
+      <th>Pengembang</th>
+      <th>Fase</th>
+      <th>Mapel</th>
+      <th>Judul</th>
+      <th>Download</th>
+      <th>Aksi</th>
+    </tr>
+  </thead>
+  <tbody>
+`;
 
-      p.items.forEach((it,i)=>{
-        let dl='-';
-        if(it.download){
-          if(it.download.toLowerCase().startsWith('http')){
-            dl = `<a href="${esc(it.download)}" target="_blank">Download</a>`;
-          } else {
-            dl = esc(it.download);
-          }
-        }
+p.items.forEach((it, i) => {
 
-        h+=`
-        <tr>
-          <td>${dl}</td>
-          <td>${i+1}</td>
-          <td>${esc(it.judul)}</td>
-          <td>
-            <button class="btn btn-small btn-success"
-              onclick="openKurasi(${it.row},'${encodeURIComponent(k)}')">
-              Kurasi
-            </button>
-          </td>
-        </tr>`;
-      });
+  // ---- Download logic (tetap seperti sebelumnya)
+  let dl = '-';
+  if (it.download) {
+    if (it.download.toLowerCase().startsWith('http')) {
+      dl = `<a href="${esc(it.download)}" target="_blank">Download</a>`;
+    } else {
+      dl = esc(it.download);
+    }
+  }
 
-      listArea.innerHTML = h+'</tbody></table>';
+  // ---- Tombol aksi (kurasi / sudah dikurasi)
+  let aksiBtn = `
+    <button class="btn btn-small btn-success"
+      onclick="openKurasi(${it.row}, '${encodeURIComponent(k)}')">
+      Kurasi
+    </button>
+  `;
+
+  if (it.alreadyCuratedBy && it.alreadyCuratedBy.trim() !== '') {
+    aksiBtn = `
+      <button class="btn btn-small" disabled>
+        Sudah dikurasi
+      </button>
+    `;
+  }
+
+  h += `
+    <tr>
+      <td>${i + 1}</td>
+      <td>${esc(it.pengembang)}</td>
+      <td>${esc(it.fase)}</td>
+      <td>${esc(it.mapel)}</td>
+      <td>${esc(it.judul)}</td>
+      <td>${dl}</td>
+      <td>${aksiBtn}</td>
+    </tr>
+  `;
+});
+
+h += `
+  </tbody>
+</table>
+`;
+
+listArea.innerHTML = h;
+
     });
 };
 
