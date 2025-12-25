@@ -69,7 +69,7 @@ function loadContents() {
       listDiv.innerHTML = data.rows.map((r, i) => `
         <div class="content-item" onclick="loadDetail(${i})">
           <b>${r[6]}</b><br>
-          <small>Mapel: ${r[5]}</small>
+          <small>Mapel: ${r[5]}</small><br>
           <small>Kurator: ${r[1]}</small>
         </div>
       `).join('');
