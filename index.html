@@ -66,6 +66,10 @@ document.getElementById('btnLoad').onclick=async()=>{
   const p=await res.json();
   renderList(p);
 };
+document.getElementById('btnHasil').addEventListener('click', function () {
+  window.location.href = 'hasilkurasi.html';
+});
+
 
 /* -------------------- RENDER LIST -------------------- */
 function renderList(payload){
