@@ -1,98 +1,68 @@
-body { 
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; 
-  margin: 20px auto; 
-  max-width: 800px;
-  background-color: #f8fafc;
-  color: #334155;
-  padding: 0 15px;
+body{
+  font-family: system-ui, Arial, sans-serif;
+  background:#f8fafc;
+  color:#334155;
+  margin:20px auto;
+  max-width:1100px;
 }
 
-/* HEADER */
-header {
-  background: white;
-  text-align: center;
-  margin-bottom: 25px;
-  padding: 25px 20px;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  border: 1px solid #e2e8f0;
+header{
+  background:#fff;
+  padding:20px;
+  border-radius:12px;
+  text-align:center;
+  box-shadow:0 1px 3px rgba(0,0,0,.1);
 }
 
-.logo-group {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 15px;
-  flex-wrap: wrap;
+.logo-group{
+  display:flex;
+  justify-content:center;
+  gap:15px;
+  flex-wrap:wrap;
+  margin-bottom:10px;
 }
 
-.logo-group img { height: 45px; }
-#logoHeader { height: 55px; }
+.logo-group img{height:45px}
 
-h1 {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin: 4px 0;
+.controls{
+  display:flex;
+  gap:10px;
+  margin-top:15px;
+  flex-wrap:wrap;
 }
 
-.sub-header-line {
-  font-size: 0.85rem;
-  color: #64748b;
-  margin: 2px 0;
+select,button{
+  padding:10px;
+  border-radius:6px;
+  font-size:.9rem;
 }
 
-.muted {
-  color: #94a3b8;
-  font-size: 0.9rem;
-  margin-top: 10px;
+select{flex:1}
+
+.btn-primary{background:#3b82f6;color:#fff;border:none}
+.btn-secondary{background:#e5e7eb;border:none}
+.btn-success{background:#16a34a;color:#fff;border:none}
+
+.card{
+  background:#fff;
+  margin-top:20px;
+  padding:20px;
+  border-radius:10px;
 }
 
-/* CONTROLS */
-.controls {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid #f1f5f9;
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
 }
 
-@media (min-width: 600px) {
-  .controls { flex-direction: row; align-items: center; }
-  .controls select { flex: 1; }
+th,td{
+  border:1px solid #e5e7eb;
+  padding:8px;
+  font-size:.85rem;
 }
 
-/* BUTTON */
-.btn {
-  padding: 10px 20px;
-  border-radius: 6px;
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
-}
+th{background:#f1f5f9}
 
-.btn-primary {
-  background-color: #3b82f6;
-  color: white;
-}
-
-/* CARD */
-.card {
-  background: white;
-  border-top: 4px solid #3b82f6;
-  padding: 25px;
-  margin-top: 25px;
-  border-radius: 8px;
-}
-
-/* CONTENT LIST */
-.content-item {
-  cursor: pointer;
-  padding: 15px;
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  margin-bottom: 10px;
-}
+.muted{color:#64748b;font-size:.9rem}
+.hidden{display:none}
