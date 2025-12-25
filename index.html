@@ -1,138 +1,168 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kurasi MPI 2</title>
 <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
 
 <header>
   <div class="logo-group">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/9/9c/Logo_of_Ministry_of_Education_and_Culture_of_Republic_of_Indonesia.svg">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Logo_of_Ministry_of_Education_and_Culture_of_Republic_of_Indonesia.svg/1200px-Logo_of_Ministry_of_Education_and_Culture_of_Republic_of_Indonesia.svg.png" id="logoHeader">
+    <img src="https://trigger.id/wp-content/uploads/2025/05/pendidikan-1024x452.png">
     <img src="https://kemendikdasmen.go.id/kem_base/static/src/img/ramah.png">
+    <img src="https://cdn-sdotid.adg.id/images/70b5e75c-f103-4e51-9b76-432a91d07494_980x382.png">
   </div>
 
-  <h2>Kurasi Media Pembelajaran Interaktif</h2>
+  <h1>Kurasi Media Pembelajaran Interaktif Jilid 2</h1>
+  <h1>Direktorat Sekolah Dasar</h1>
+  <h2 class="sub-header-line">Direktorat Jenderal PAUD, Dikdas, dan Dikmen</h2>
+  <h2 class="sub-header-line">Kementerian Pendidikan Dasar dan Menengah</h2>
+  <div class="muted">Pilih kurator lalu muat konten untuk dikurasi.</div>
+
   <div class="controls">
     <select id="kuratorSel">
       <option value="">-- Pilih Kurator --</option>
     </select>
-    <button class="btn-primary" onclick="loadKonten()">Muat Konten</button>
-    <button class="btn-secondary" onclick="location.href='hasilkurasi.html'">
-      Lihat Hasil Kurasi
-    </button>
+    <button class="btn btn-primary" id="btnLoad">Muat Konten</button>
+    <button class="btn btn-secondary" id="btnHasil">Lihat Hasil Kurasi</button>
   </div>
 </header>
 
-<div id="listArea" class="card muted">Silakan pilih kurator.</div>
+<div id="listArea" class="card muted">
+  Belum ada data. Pilih kurator lalu klik "Muat Konten".
+</div>
+
 <div id="kurasiPanel" class="card hidden"></div>
 
 <script>
-const API = "https://script.google.com/macros/s/AKfycbx__Yig33QCnywBPzOU-oD899gdjJL1OWoca7ajKIOsRpvbjx1NZZoDsBd3ZjC42pmi/exec";
+const API_URL = "PASTE_URL_WEBAPP_ANDA_DI_SINI";
 
-const esc = s => String(s||'').replace(/[&<>"']/g,m=>(
-  {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]
-));
-
-async function loadKurator(){
-  const r = await fetch(API+'?action=kurators');
-  const d = await r.json();
-  const s = document.getElementById('kuratorSel');
-  d.forEach(v=>s.innerHTML+=`<option>${v}</option>`);
+/* UTIL */
+function esc(s){
+  return String(s||'').replace(/[&<>"']/g,m=>(
+    {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]
+  ));
 }
 
-async function loadKonten(){
+/* LOAD KURATOR */
+window.onload = () => {
+  fetch(API_URL+'?action=kurators')
+    .then(r=>r.json())
+    .then(d=>{
+      d.forEach(n=>{
+        kuratorSel.innerHTML += `<option>${n}</option>`;
+      });
+    });
+};
+
+/* LOAD KONTEN */
+btnLoad.onclick = () => {
   const k = kuratorSel.value;
   if(!k) return alert('Pilih kurator');
 
-  listArea.innerHTML = 'Memuat...';
+  listArea.innerHTML = 'Memuat konten...';
 
-  const r = await fetch(API + '?action=available&kurator=' + encodeURIComponent(k));
-  const p = await r.json();
+  fetch(API_URL+'?action=available&kurator='+encodeURIComponent(k))
+    .then(r=>r.json())
+    .then(p=>{
+      let h = `
+      <table>
+        <thead>
+          <tr>
+            <th>Download</th>
+            <th>#</th>
+            <th>Judul</th>
+            <th>Aksi</th>
+          </tr>
+        </thead><tbody>`;
 
-  let h = `
-    <table>
-      <thead>
+      p.items.forEach((it,i)=>{
+        let dl='-';
+        if(it.download){
+          if(it.download.toLowerCase().startsWith('http')){
+            dl = `<a href="${esc(it.download)}" target="_blank">Download</a>`;
+          } else {
+            dl = esc(it.download);
+          }
+        }
+
+        h+=`
         <tr>
-          <th>Download</th>
-          <th>#</th>
-          <th>Judul</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
+          <td>${dl}</td>
+          <td>${i+1}</td>
+          <td>${esc(it.judul)}</td>
+          <td>
+            <button class="btn btn-small btn-success"
+              onclick="openKurasi(${it.row},'${encodeURIComponent(k)}')">
+              Kurasi
+            </button>
+          </td>
+        </tr>`;
+      });
 
-  p.items.forEach((it, i) => {
-    const dl = it.download ? String(it.download).trim() : '';
+      listArea.innerHTML = h+'</tbody></table>';
+    });
+};
 
-    let dlHtml = '-';
-    if (dl && dl.toLowerCase().startsWith('http')) {
-      dlHtml = `<a href="${esc(dl)}" target="_blank" rel="noopener">Download</a>`;
-    } else if (dl) {
-      dlHtml = `<span class="muted" title="${esc(dl)}">
-                  ${esc(dl.length > 25 ? dl.slice(0,25)+'…' : dl)}
-                </span>`;
-    }
-
-    h += `
-      <tr>
-        <td>${dlHtml}</td>
-        <td>${i+1}</td>
-        <td>${esc(it.judul)}</td>
-        <td>
-          <button class="btn-success"
-            onclick="openKurasi(${it.row}, '${encodeURIComponent(k)}')">
-            Kurasi
-          </button>
-        </td>
-      </tr>
-    `;
-  });
-
-  h += '</tbody></table>';
-  listArea.innerHTML = h;
-}
-
-
-async function openKurasi(row,kur){
+/* OPEN KURASI */
+function openKurasi(row,kurEnc){
+  const kur = decodeURIComponent(kurEnc);
   kurasiPanel.classList.remove('hidden');
-  kurasiPanel.innerHTML='Memuat form...';
-  const r = await fetch(API+`?action=payload&row=${row}&kurator=${kur}`);
-  const p = await r.json();
+  kurasiPanel.innerHTML = 'Memuat form...';
 
-  let h = `<h3>${esc(p.sumberJudul)}</h3>`;
-  p.questions.forEach((q,i)=>{
-    h+=`
-      <label>${i+1}. ${esc(q)}</label>
-      <select id="q${i}"><option></option><option>Ya</option><option>Tidak</option></select>
-      <textarea id="n${i}" rows="2"></textarea>
-    `;
-  });
-  h+=`<button class="btn-success" onclick="submit(${row},'${esc(p.kurator)}',${p.questions.length})">
-        Kirim</button>`;
-  kurasiPanel.innerHTML=h;
+  fetch(API_URL+`?action=payload&row=${row}&kurator=${encodeURIComponent(kur)}`)
+    .then(r=>r.json())
+    .then(p=>{
+      let h = `<h3>${esc(p.sumberJudul)}</h3>`;
+      p.questions.forEach((q,i)=>{
+        h+=`
+          <p><b>${i+1}. ${esc(q)}</b></p>
+          <select id="q${i}">
+            <option value=""></option>
+            <option>Ya</option>
+            <option>Tidak</option>
+          </select>
+          <textarea id="n${i}" rows="2"></textarea>
+        `;
+      });
+
+      h+=`<button class="btn btn-success"
+        onclick="submitKurasi(${row},'${esc(kur)}',${p.questions.length})">
+        Kirim
+      </button>`;
+
+      kurasiPanel.innerHTML = h;
+    });
 }
 
-async function submit(row,kur,qc){
+/* SUBMIT */
+function submitKurasi(row,kur,qc){
   const a=[],n=[];
   for(let i=0;i<qc;i++){
     a.push(document.getElementById('q'+i).value);
     n.push(document.getElementById('n'+i).value);
   }
-  await fetch(API,{
+
+  fetch(API_URL,{
     method:'POST',
     headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body:JSON.stringify({action:'submitKurasi',payload:{row,kurator:kur,answers:a,notes:n}})
+    body:JSON.stringify({
+      action:'submitKurasi',
+      payload:{row,kurator:kur,answers:a,notes:n}
+    })
+  }).then(()=>{
+    alert('Hasil kurasi tersimpan');
+    kurasiPanel.classList.add('hidden');
+    btnLoad.click();
   });
-  alert('Berhasil disimpan');
-  kurasiPanel.classList.add('hidden');
-  loadKonten();
 }
 
-loadKurator();
+/* NAV */
+btnHasil.onclick = () => location.href='hasilkurasi.html';
 </script>
 </body>
 </html>
