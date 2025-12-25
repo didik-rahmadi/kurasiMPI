@@ -87,7 +87,6 @@ btnLoad.onclick = () => {
 
 p.items.forEach((it, i) => {
 
-  // ---- Download logic (tetap seperti sebelumnya)
   let dl = '-';
   if (it.download) {
     if (it.download.toLowerCase().startsWith('http')) {
@@ -97,7 +96,6 @@ p.items.forEach((it, i) => {
     }
   }
 
-  // ---- Tombol aksi (kurasi / sudah dikurasi)
   let aksiBtn = `
     <button class="btn btn-small btn-success"
       onclick="openKurasi(${it.row}, '${encodeURIComponent(k)}')">
@@ -106,16 +104,12 @@ p.items.forEach((it, i) => {
   `;
 
   if (it.alreadyCuratedBy && it.alreadyCuratedBy.trim() !== '') {
-    aksiBtn = `
-      <button class="btn btn-small" disabled>
-        Sudah dikurasi
-      </button>
-    `;
+    aksiBtn = `<button class="btn btn-small" disabled>Sudah dikurasi</button>`;
   }
 
   h += `
     <tr>
-      <td>${i + 1}</td>
+      <td>${i+1}</td>
       <td>${esc(it.pengembang)}</td>
       <td>${esc(it.fase)}</td>
       <td>${esc(it.mapel)}</td>
@@ -126,13 +120,8 @@ p.items.forEach((it, i) => {
   `;
 });
 
-h += `
-  </tbody>
-</table>
-`;
-
+h += '</tbody></table>';
 listArea.innerHTML = h;
-
     });
 };
 
@@ -146,39 +135,58 @@ function openKurasi(row,kurEnc){
     .then(r=>r.json())
     .then(p=>{
       let h = `<h3>${esc(p.sumberJudul)}</h3>`;
+
       p.questions.forEach((q,i)=>{
         h+=`
           <p><b>${i+1}. ${esc(q)}</b></p>
           <select id="q${i}">
-            <option value=""></option>
+            <option value="">-- Pilih --</option>
             <option>Ya</option>
             <option>Tidak</option>
           </select>
           <textarea id="n${i}" rows="2"></textarea>
         `;
       });
-      h += `
-          <hr>
-          <p><b>Komentar Umum / Kesimpulan Akhir</b></p>
-          <textarea id="komentar" rows="4"
-            placeholder="Tuliskan kesimpulan atau komentar umum atas konten ini..."></textarea>
-        `;
 
-      h+=`<button class="btn btn-success"
-        onclick="submitKurasi(${row},'${esc(kur)}',${p.questions.length})">
-        Kirim
-      </button>`;
+      h += `
+        <hr>
+        <p><b>Komentar Umum / Kesimpulan Akhir</b></p>
+        <textarea id="komentar" rows="4"></textarea>
+      `;
+
+      h+=`
+        <button class="btn btn-success"
+          onclick="submitKurasi(${row},'${esc(kur)}',${p.questions.length})">
+          Kirim
+        </button>
+      `;
 
       kurasiPanel.innerHTML = h;
     });
 }
 
-/* SUBMIT */
+/* SUBMIT (VALIDASI WAJIB YA / TIDAK) */
 function submitKurasi(row,kur,qc){
-  const a=[],n=[];
+  const a=[], n=[];
+  let firstEmpty = -1;
+
   for(let i=0;i<qc;i++){
-    a.push(document.getElementById('q'+i).value);
+    const val = document.getElementById('q'+i).value;
+    a.push(val);
     n.push(document.getElementById('n'+i).value);
+
+    if(!val && firstEmpty === -1){
+      firstEmpty = i;
+    }
+  }
+
+  if(firstEmpty !== -1){
+    alert(
+      'Semua pertanyaan WAJIB dijawab.\n\n' +
+      'Lengkapi pertanyaan nomor ' + (firstEmpty+1)
+    );
+    document.getElementById('q'+firstEmpty).focus();
+    return;
   }
 
   fetch(API_URL,{
@@ -191,9 +199,8 @@ function submitKurasi(row,kur,qc){
         kurator: kur,
         answers: a,
         notes: n,
-        komentar: document.getElementById('komentar')?.value || ''
+        komentar: document.getElementById('komentar').value || ''
       }
-
     })
   }).then(()=>{
     alert('Hasil kurasi tersimpan');
