@@ -1,111 +1,60 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Hasil Kurasi</title>
-  <link rel="stylesheet" href="/kurasi-mpi/styles.css">
-  </head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hasil Kurasi</title>
+<link rel="stylesheet" href="styles.css">
+</head>
 
 <body>
 
 <header>
-  <div>
-    <div class="logo-group">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Logo_of_Ministry_of_Education_and_Culture_of_Republic_of_Indonesia.svg/1200px-Logo_of_Ministry_of_Education_and_Culture_of_Republic_of_Indonesia.svg.png" id="logoHeader" alt="Logo Kemendikbud">
-      <img src="https://trigger.id/wp-content/uploads/2025/05/pendidikan-1024x452.png" class="logo-side" alt="Logo Pendidikan">
-      <img src="https://kemendikdasmen.go.id/kem_base/static/src/img/ramah.png" class="logo-side" alt="Logo Ramah Anak">
-      <img src="https://cdn-sdotid.adg.id/images/70b5e75c-f103-4e51-9b76-432a91d07494_980x382.png" class="logo-side" alt="Logo Lainnya">
-    </div>
-    <h1>Kurasi Media Pembelajaran Interaktif Jilid 2</h1>
-    <h1>Direktorat Sekolah Dasar</h1>
-    <h2 class="sub-header-line">Direktorat Jenderal Pendidikan Anak Usia Dini, Pendidikan Dasar, dan Pendidikan Menengah</h2>
-    <h2 class="sub-header-line">Kementerian Pendidikan Dasar dan Menengah</h2>  
-    <div class="muted">Pilih kreator untuk melihat hasil kurasi.</div>
-  </div>
-
+  <h2>Hasil Kurasi</h2>
   <div class="controls">
     <select id="creator"></select>
-    <button onclick="loadContents()" class="btn btn-primary">Lihat Hasil Kurasi</button>
-    <button class="btn btn-primary" onclick="window.location.href='index.html'">
-  ← Kembali ke Kurasi
+    <button class="btn-primary" onclick="loadHasil()">Lihat</button>
+    <button class="btn-secondary" onclick="location.href='index.html'">
+      Kembali
     </button>
-
   </div>
 </header>
 
-<div id="contentList"></div>
-<div id="detail"></div>
+<div id="contentList" class="card"></div>
+<div id="detail" class="card"></div>
 
 <script>
-/* ================== GANTI DENGAN URL WEB APP ANDA ================== */
-const API_URL = "https://script.google.com/macros/s/AKfycbx0U94YJUKABMde2BA9PDhcA5IrZ8Dh9RluFlh4pc4yMJb6rROH3fkMTZlqRpsGtPzqmg/exec";
+const API="https://script.google.com/macros/s/AKfycbx0U94YJUKABMde2BA9PDhcA5IrZ8Dh9RluFlh4pc4yMJb6rROH3fkMTZlqRpsGtPzqmg/exec";
+const esc=s=>String(s||'');
 
-/* ================== LOAD KREATOR ================== */
-async function loadCreators() {
-  const res = await fetch(`${API_URL}?action=creators`);
-  const data = await res.json();
-
-  const s = document.getElementById('creator');
-  s.innerHTML = '<option value="">-- pilih kreator --</option>';
-  data.forEach(n => s.innerHTML += `<option>${n}</option>`);
+async function loadCreators(){
+  const r=await fetch(API+'?action=creators');
+  const d=await r.json();
+  creator.innerHTML='<option></option>';
+  d.forEach(v=>creator.innerHTML+=`<option>${v}</option>`);
 }
 
-/* ================== LOAD KONTEN ================== */
-async function loadContents() {
-  const creator = document.getElementById('creator').value;
-  if (!creator) return alert('Pilih kreator terlebih dahulu');
-
-  const div = document.getElementById('contentList');
-  div.innerHTML = '<p>Memuat konten...</p>';
-  document.getElementById('detail').innerHTML = '';
-
-  const res = await fetch(`${API_URL}?action=contents&creator=${encodeURIComponent(creator)}`);
-  const data = await res.json();
-
-  div.innerHTML = '<h3>Daftar Konten</h3>';
-  data.forEach(d => {
-    div.innerHTML += `
-      <div class="content-item" onclick="loadDetail(${d.rowNumber})">
-        <b>${d.identitas.E}</b><br>
-        ${d.identitas.F} | ${d.identitas.G}
-        <small>Kurator: ${d.identitas.kurator}</small>
-      </div>`;
-  });
+async function loadHasil(){
+  const c=creator.value;
+  if(!c) return;
+  const r=await fetch(API+'?action=contents&creator='+encodeURIComponent(c));
+  const d=await r.json();
+  contentList.innerHTML=d.map(it=>`
+    <div class="content-item" onclick="detailHasil(${it.rowNumber})">
+      <b>${esc(it.identitas.E)}</b>
+    </div>`).join('');
 }
 
-/* ================== LOAD DETAIL ================== */
-async function loadDetail(row) {
-  const detailDiv = document.getElementById('detail');
-  detailDiv.innerHTML = '<p>Memuat detail...</p>';
-  detailDiv.scrollIntoView({behavior: "smooth"});
-
-  const res = await fetch(`${API_URL}?action=detail&row=${row}`);
-  const data = await res.json();
-
-  detailDiv.innerHTML = `
-    <div class="card">
-      <p><b>Kreator:</b> ${data.identitas.kreator}</p>
-      <p><b>Kurator:</b> ${data.identitas.kurator}</p>
-      <p style="color:#3b82f6;font-size:1.1em">
-        <b>${data.identitas.E}</b><br>
-        ${data.identitas.F} | ${data.identitas.G}
-      </p>
-      <hr>
-      ${data.qa.map(q => `
-        <p><b>${q.pertanyaan}</b></p>
-        <div class="jawaban">
-          <div>• ${q.jawaban[0]}</div>
-          <div>• ${q.jawaban[1]}</div>
-        </div>
-      `).join('')}
-    </div>
-  `;
+async function detailHasil(row){
+  const r=await fetch(API+'?action=detail&row='+row);
+  const d=await r.json();
+  detail.innerHTML=d.qa.map(q=>`
+    <b>${q.pertanyaan}</b>
+    <div>${q.jawaban.join('<br>')}</div>
+  `).join('');
 }
 
-/* ================== INIT ================== */
 loadCreators();
 </script>
-
 </body>
 </html>
