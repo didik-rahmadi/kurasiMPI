@@ -46,21 +46,56 @@ async function loadKurator(){
 async function loadKonten(){
   const k = kuratorSel.value;
   if(!k) return alert('Pilih kurator');
-  listArea.innerHTML='Memuat...';
-  const r = await fetch(API+'?action=available&kurator='+encodeURIComponent(k));
+
+  listArea.innerHTML = 'Memuat...';
+
+  const r = await fetch(API + '?action=available&kurator=' + encodeURIComponent(k));
   const p = await r.json();
 
-  let h = '<table><tr><th>#</th><th>Judul</th><th>Aksi</th></tr>';
-  p.items.forEach((it,i)=>{
-    h+=`<tr>
-      <td>${i+1}</td>
-      <td>${esc(it.judul)}</td>
-      <td><button class="btn-success"
-        onclick="openKurasi(${it.row},'${encodeURIComponent(k)}')">Kurasi</button></td>
-    </tr>`;
+  let h = `
+    <table>
+      <thead>
+        <tr>
+          <th>Download</th>
+          <th>#</th>
+          <th>Judul</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  p.items.forEach((it, i) => {
+    const dl = it.download ? String(it.download).trim() : '';
+
+    let dlHtml = '-';
+    if (dl && dl.toLowerCase().startsWith('http')) {
+      dlHtml = `<a href="${esc(dl)}" target="_blank" rel="noopener">Download</a>`;
+    } else if (dl) {
+      dlHtml = `<span class="muted" title="${esc(dl)}">
+                  ${esc(dl.length > 25 ? dl.slice(0,25)+'…' : dl)}
+                </span>`;
+    }
+
+    h += `
+      <tr>
+        <td>${dlHtml}</td>
+        <td>${i+1}</td>
+        <td>${esc(it.judul)}</td>
+        <td>
+          <button class="btn-success"
+            onclick="openKurasi(${it.row}, '${encodeURIComponent(k)}')">
+            Kurasi
+          </button>
+        </td>
+      </tr>
+    `;
   });
-  listArea.innerHTML=h+'</table>';
+
+  h += '</tbody></table>';
+  listArea.innerHTML = h;
 }
+
 
 async function openKurasi(row,kur){
   kurasiPanel.classList.remove('hidden');
