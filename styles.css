@@ -1,4 +1,31 @@
 /* =========================
+   VARIABLES & THEME
+========================= */
+:root {
+  /* Color Palette - Professional Blue Theme */
+  --primary: #2563eb;       /* Biru Utama */
+  --primary-hover: #1d4ed8;
+  --bg-body: #f3f4f6;       /* Abu-abu sangat muda untuk background */
+  --bg-card: #ffffff;
+  --text-main: #1f2937;     /* Hampir hitam */
+  --text-muted: #6b7280;    /* Abu-abu teks */
+  --border-color: #e5e7eb;  /* Abu-abu border halus */
+  
+  /* Status Colors */
+  --success: #10b981;
+  --warning-bg: #fff7ed;
+  --warning-border: #fdba74;
+  
+  /* Spacing & Sizing */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --font-base: "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* =========================
    RESET & BASE
 ========================= */
 * {
@@ -7,365 +34,334 @@
 
 body {
   margin: 0;
-  padding: 24px 16px 60px;
-  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background: #f4f6f9;
-  color: #1f2937;
-  line-height: 1.5;
+  padding: 20px;
+  font-family: var(--font-base);
+  background: var(--bg-body);
+  color: var(--text-main);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased; /* Font lebih tajam di Mac/iOS */
 }
 
 .hidden {
   display: none !important;
 }
 
+/* Wrapper untuk membatasi lebar konten agar rapi di layar besar */
+.container {
+  max-width: 1000px; /* Sedikit diperkecil agar lebih fokus */
+  margin: 0 auto;
+}
+
 /* =========================
    HEADER
 ========================= */
 header {
-  max-width: 1200px;
-  margin: 0 auto 28px;
-  background: #ffffff;
-  border-radius: 14px;
-  padding: 26px 24px 22px;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 30px 20px;
   text-align: center;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-md);
+  margin-bottom: 24px;
+  border: 1px solid var(--border-color);
 }
 
 .logo-group {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 18px;
+  gap: 20px;
   flex-wrap: wrap;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 .logo-group img {
-  height: 42px;
-}
-
-#logoHeader {
-  height: 56px;
+  height: 48px; /* Sedikit diperbesar */
+  object-fit: contain;
 }
 
 header h1 {
-  margin: 4px 0;
-  font-size: 22px;
-  font-weight: 700;
-  color: #0f172a;
+  margin: 8px 0;
+  font-size: 24px;
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -0.025em;
 }
 
 .sub-header-line {
-  font-size: 14px;
-  color: #475569;
-  margin: 2px 0;
-}
-
-.muted {
-  font-size: 14px;
-  color: #64748b;
-  margin-top: 10px;
+  font-size: 15px;
+  color: var(--text-muted);
+  font-weight: 500;
 }
 
 /* =========================
-   CONTROLS (SELECT & BUTTON)
+   CONTROLS (FILTERS)
 ========================= */
 .controls {
-  margin-top: 18px;
-  padding-top: 18px;
-  border-top: 1px solid #e5e7eb;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-color);
   display: flex;
   gap: 12px;
   justify-content: center;
   flex-wrap: wrap;
 }
 
-select {
-  min-width: 260px;
+/* Input & Select Styling Modern */
+select, input[type="text"], textarea {
   padding: 10px 14px;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-  background: #ffffff;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: #fff;
   font-size: 14px;
+  color: var(--text-main);
+  transition: all 0.2s;
 }
 
-select:focus {
+select:focus, input:focus, textarea:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
+/* =========================
+   BUTTONS
+========================= */
 .btn {
-  padding: 10px 18px;
-  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
   font-size: 14px;
   font-weight: 600;
   border: none;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
+  text-decoration: none;
 }
 
 .btn-primary {
-  background: #2f80ed;
+  background: var(--primary);
   color: #ffffff;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
 }
 
 .btn-primary:hover {
-  background: #2563eb;
+  background: var(--primary-hover);
+  transform: translateY(-1px);
 }
 
 .btn-secondary {
   background: #ffffff;
-  color: #111827;
-  border: 1px solid #d1d5db;
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
 }
 
 .btn-secondary:hover {
   background: #f9fafb;
+  border-color: #d1d5db;
 }
 
 .btn-success {
-  background: #16a34a;
+  background: var(--success);
   color: #ffffff;
 }
 
 .btn-success:hover {
-  background: #15803d;
+  background: #059669;
 }
 
-.btn-small {
-  padding: 6px 12px;
-  font-size: 13px;
-}
-
-/* =========================
-   CARD
-========================= */
-.card {
-  max-width: 1200px;
-  margin: 0 auto 28px;
-  background: #ffffff;
-  border-radius: 14px;
-  padding: 22px 24px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
-}
-
-/* =========================
-   TOP META (KURATOR INFO)
-========================= */
-.top-meta {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 18px;
-}
-
-.tag {
-  background: #e0f2fe;
-  color: #0369a1;
-  padding: 6px 14px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.badge {
-  background: #e5e7eb;
-  color: #111827;
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-/* =========================
-   TABLE
-========================= */
-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  font-size: 14px;
-}
-
-thead th {
-  background: #2f80ed;
-  color: #ffffff;
-  text-transform: uppercase;
-  font-size: 12px;
-  letter-spacing: 0.06em;
-  padding: 14px 10px;
-  border-bottom: 1px solid #2563eb;
-}
-
-thead th:first-child {
-  border-top-left-radius: 10px;
-}
-
-thead th:last-child {
-  border-top-right-radius: 10px;
-}
-
-tbody td {
-  padding: 14px 10px;
-  border-bottom: 1px solid #e5e7eb;
-  vertical-align: top;
-  color: #374151;
-}
-
-tbody tr:nth-child(even) {
-  background: #f9fafb;
-}
-
-/* =========================
-   DOWNLOAD BUTTON
-========================= */
-a[target="_blank"] {
-  display: inline-block;
-  padding: 6px 14px;
-  background: #ffffff;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #2563eb;
-  text-decoration: none;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-}
-
-a[target="_blank"]:hover {
-  background: #f0f9ff;
-}
-
-/* =========================
-   DISABLED BUTTON
-========================= */
-button[disabled],
-.btn-disabled {
+button[disabled], .btn-disabled {
   background: #e5e7eb !important;
   color: #9ca3af !important;
   cursor: not-allowed;
+  transform: none !important;
   box-shadow: none !important;
 }
 
 /* =========================
-   CONTENT LIST (HASIL)
+   CARDS & PANELS
 ========================= */
-.content-item {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 14px 16px;
-  margin-bottom: 12px;
-  cursor: pointer;
-  transition: all 0.15s ease;
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-color);
+  margin-bottom: 24px;
 }
 
-.content-item:hover {
+/* Top Meta (Info Kurator) */
+.top-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tag {
   background: #eff6ff;
-  border-color: #3b82f6;
+  color: var(--primary);
+  padding: 6px 12px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 /* =========================
-   FORM KURASI
+   TABLE STYLING
+========================= */
+.table-responsive {
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  background: white;
+}
+
+thead th {
+  background: #f8fafc;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+  text-align: left;
+}
+
+tbody td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-main);
+  vertical-align: middle;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr:hover {
+  background: #f9fafb;
+}
+
+/* Download Link Style */
+a[target="_blank"] {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+a[target="_blank"]:hover {
+  text-decoration: underline;
+}
+
+/* =========================
+   FORM KURASI (RE-DESIGNED)
 ========================= */
 .kurasi-header {
   text-align: center;
   font-size: 20px;
   font-weight: 700;
   color: #1e3a8a;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .kurasi-subheader {
   text-align: center;
-  font-size: 15px;
-  color: #475569;
-  margin-bottom: 22px;
-}
-
-.question {
-  margin-bottom: 22px;
-}
-
-.question label {
-  font-weight: 600;
-  margin-bottom: 6px;
-  display: block;
-}
-
-textarea {
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
   font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+}
+
+#kurasiPanel {
+  /* Panel utama sekarang background putih bersih di dalam card */
+  background: transparent; 
+}
+
+/* Setiap item pertanyaan kita buat jadi block terpisah yg rapi */
+.question-block {
+  background: #f8fafc; /* Abu kebiruan sangat muda */
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+/* Label Pertanyaan (Paragraph di dalam question-block) */
+/* Asumsi HTML Anda: <p><b>Pertanyaan?</b></p> */
+#kurasiPanel p { 
+  margin: 0 0 10px 0;
+  color: var(--text-main);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+#kurasiPanel p b {
+  font-weight: 600;
+}
+
+/* Select dan Textarea di dalam kurasi */
+#kurasiPanel select, 
+#kurasiPanel textarea {
+  width: 100%;
+  margin-bottom: 10px;
+  background: #ffffff;
+  border-color: #cbd5e1;
+}
+
+#kurasiPanel select {
+  height: 42px; /* Tinggi yang nyaman untuk touch */
+}
+
+#kurasiPanel textarea {
+  min-height: 80px;
   resize: vertical;
 }
 
-textarea:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+/* Khusus Komentar Umum */
+textarea#komentar {
+  background: var(--warning-bg);
+  border: 1px solid var(--warning-border);
+  color: #9a3412;
+  font-weight: 500;
+}
+
+textarea#komentar::placeholder {
+  color: #c2410c;
+  opacity: 0.6;
 }
 
 hr {
   border: none;
-  border-top: 1px solid #e5e7eb;
-  margin: 22px 0;
+  height: 1px;
+  background: var(--border-color);
+  margin: 30px 0;
 }
 
-/* Panel utama form kurasi */
-#kurasiPanel {
-  background: #f1f5f9; /* abu kebiruan lembut */
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+  header, .card {
+    padding: 20px 16px;
+  }
+  
+  .controls {
+    flex-direction: column;
+  }
+  
+  select, .btn {
+    width: 100%;
+  }
+  
+  .logo-group img {
+    height: 36px;
+  }
 }
-
-/* Blok setiap pertanyaan */
-#kurasiPanel p > b {
-  display: block;
-  margin-bottom: 6px;
-}
-
-#kurasiPanel select,
-#kurasiPanel textarea {
-  display: block;
-  width: 100%;
-  margin-bottom: 18px;
-}
-
-/* Panel putih untuk tiap soal */
-#kurasiPanel select {
-  background: #ffffff;
-}
-
-#kurasiPanel textarea {
-  background: #ffffff;
-}
-
-/* Setiap soal terasa sebagai kartu terpisah */
-#kurasiPanel p {
-  background: #ffffff;
-  padding: 14px 16px;
-  border-radius: 10px 10px 0 0;
-  margin-bottom: 0;
-}
-
-#kurasiPanel p + select {
-  background: #ffffff;
-  padding: 10px 12px;
-  border-radius: 0 0 0 0;
-}
-
-#kurasiPanel p + select + textarea {
-  background: #ffffff;
-  padding: 10px 12px;
-  border-radius: 0 0 10px 10px;
-  margin-bottom: 22px;
-}
-
-/* Komentar umum */
-#kurasiPanel textarea#komentar {
-  background: #fff7ed; /* krem lembut */
-  border: 1px solid #fdba74;
-}
-
