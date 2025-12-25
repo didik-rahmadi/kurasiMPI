@@ -128,14 +128,13 @@ function openKurasi(row,kurEnc){
           </select>
           <textarea id="n${i}" rows="2"></textarea>
         `;
-        h += `
+      });
+      h += `
           <hr>
           <p><b>Komentar Umum / Kesimpulan Akhir</b></p>
           <textarea id="komentar" rows="4"
             placeholder="Tuliskan kesimpulan atau komentar umum atas konten ini..."></textarea>
         `;
-
-      });
 
       h+=`<button class="btn btn-success"
         onclick="submitKurasi(${row},'${esc(kur)}',${p.questions.length})">
