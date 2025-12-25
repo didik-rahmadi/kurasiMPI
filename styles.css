@@ -314,3 +314,58 @@ hr {
   border-top: 1px solid #e5e7eb;
   margin: 22px 0;
 }
+
+/* Panel utama form kurasi */
+#kurasiPanel {
+  background: #f1f5f9; /* abu kebiruan lembut */
+}
+
+/* Blok setiap pertanyaan */
+#kurasiPanel p > b {
+  display: block;
+  margin-bottom: 6px;
+}
+
+#kurasiPanel select,
+#kurasiPanel textarea {
+  display: block;
+  width: 100%;
+  margin-bottom: 18px;
+}
+
+/* Panel putih untuk tiap soal */
+#kurasiPanel select {
+  background: #ffffff;
+}
+
+#kurasiPanel textarea {
+  background: #ffffff;
+}
+
+/* Setiap soal terasa sebagai kartu terpisah */
+#kurasiPanel p {
+  background: #ffffff;
+  padding: 14px 16px;
+  border-radius: 10px 10px 0 0;
+  margin-bottom: 0;
+}
+
+#kurasiPanel p + select {
+  background: #ffffff;
+  padding: 10px 12px;
+  border-radius: 0 0 0 0;
+}
+
+#kurasiPanel p + select + textarea {
+  background: #ffffff;
+  padding: 10px 12px;
+  border-radius: 0 0 10px 10px;
+  margin-bottom: 22px;
+}
+
+/* Komentar umum */
+#kurasiPanel textarea#komentar {
+  background: #fff7ed; /* krem lembut */
+  border: 1px solid #fdba74;
+}
+
