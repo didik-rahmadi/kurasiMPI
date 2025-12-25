@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kurasi MPI 2</title>
+
+<!-- ======================= STYLE (gabungan styles.html) ======================= -->
+<style>
+body{
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  background:#f8fafc; margin:0; color:#334155;
+}
+.container{max-width:1100px;margin:auto;padding:15px}
+header{
+  background:#fff;border-radius:12px;padding:20px;margin-bottom:20px;
+  box-shadow:0 1px 3px rgba(0,0,0,.1)
+}
+.logo-group{display:flex;gap:15px;justify-content:center;flex-wrap:wrap}
+.logo-group img{height:45px}
+h1{font-size:1.1rem;margin:5px 0;text-align:center}
+h2{font-size:.85rem;color:#64748b;text-align:center;margin:2px 0}
+.muted{color:#64748b;font-size:.9rem;text-align:center;margin-top:8px}
+.controls{display:flex;gap:10px;margin-top:15px;flex-wrap:wrap}
+select,button{padding:10px;border-radius:6px;font-size:.9rem}
+select{flex:1;border:1px solid #cbd5e1}
+button{border:none;cursor:pointer}
+.btn-primary{background:#3b82f6;color:#fff}
+.btn-secondary{background:#e5e7eb}
+.btn-success{background:#16a34a;color:#fff}
+.btn-small{padding:6px 10px;font-size:.8rem}
+.card{background:#fff;border-radius:10px;padding:20px;margin-top:20px}
+.hidden{display:none}
+table{width:100%;border-collapse:collapse;margin-top:15px}
+th,td{border:1px solid #e5e7eb;padding:8px;font-size:.85rem}
+th{background:#f1f5f9}
+.alert{padding:12px;border-radius:6px;margin-top:10px}
+.alert-warning{background:#fef3c7}
+.alert-error{background:#fee2e2}
+.alert-success{background:#dcfce7}
+.loading-text{text-align:center;color:#64748b}
+.question{margin-bottom:15px}
+.question label{font-weight:600}
+.note-label{font-size:.8rem;color:#64748b}
+.form-actions{display:flex;gap:10px;margin-top:20px}
+.btn-cancel{background:#e5e7eb}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header>
+  <div class="logo-group">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/9/9c/Logo_of_Ministry_of_Education_and_Culture_of_Republic_of_Indonesia.svg">
+    <img src="https://kemendikdasmen.go.id/kem_base/static/src/img/ramah.png">
+  </div>
+  <h1>Kurasi Media Pembelajaran Interaktif Jilid 2</h1>
+  <h2>Direktorat Sekolah Dasar – Kemendikdasmen</h2>
+  <div class="muted">Pilih kurator lalu muat konten untuk dikurasi</div>
+
+  <div class="controls">
+    <select id="kuratorSel"><option value="">-- Pilih Kurator --</option></select>
+    <button class="btn-primary" id="btnLoad">Muat Konten</button>
+    <button class="btn-secondary" id="btnHasil">Lihat Hasil Kurasi</button>
+  </div>
+</header>
+
+<div id="mainArea" class="card">
+  <div id="listArea" class="muted">Belum ada data.</div>
+</div>
+
+<div id="kurasiPanel" class="card hidden"></div>
+
+</div>
+
+<!-- ======================= SCRIPT ======================= -->
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbx__Yig33QCnywBPzOU-oD899gdjJL1OWoca7ajKIOsRpvbjx1NZZoDsBd3ZjC42pmi/exec";
+
+/* -------------------- UTIL -------------------- */
+function escapeHtml(s){
+  return String(s||'').replace(/[&<>"']/g,m=>(
+    {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]
+  ));
+}
+
+/* -------------------- LOAD KURATOR -------------------- */
+async function loadKurators(){
+  const sel=document.getElementById('kuratorSel');
+  sel.innerHTML='<option value="">-- Pilih Kurator --</option>';
+  const res=await fetch(API_URL+'?action=kurators');
+  const list=await res.json();
+  list.forEach(n=>{
+    const o=document.createElement('option');o.value=n;o.text=n;sel.appendChild(o);
+  });
+}
+
+/* -------------------- LOAD KONTEN -------------------- */
+document.getElementById('btnLoad').onclick=async()=>{
+  const k=document.getElementById('kuratorSel').value;
+  if(!k) return alert('Pilih kurator dulu');
+  document.getElementById('listArea').innerHTML='Memuat...';
+  const res=await fetch(API_URL+'?action=available&kurator='+encodeURIComponent(k));
+  const p=await res.json();
+  renderList(p);
+};
+
+/* -------------------- RENDER LIST -------------------- */
+function renderList(payload){
+  if(!payload){
+    document.getElementById('listArea').innerHTML =
+      '<div class="muted">Tidak ada data.</div>';
+    return;
+  }
+
+  const info =
+    '<div class="top-meta">' +
+      '<div class="tag">Kurator: '+escapeHtml(payload.kurator)+'</div>' +
+      '<div class="muted">Telah dikurasi: '+
+        '<span class="badge">'+payload.countDone+'</span> / '+payload.maxAllowed+
+      '</div>' +
+    '</div>';
+
+  if(payload.countDone >= payload.maxAllowed){
+    document.getElementById('listArea').innerHTML =
+      info +
+      '<div class="alert alert-warning">' +
+        'Anda sudah mencapai batas kurasi ('+payload.maxAllowed+').' +
+      '</div>';
+    return;
+  }
+
+  if(!payload.items || payload.items.length === 0){
+    document.getElementById('listArea').innerHTML =
+      info + '<div class="muted">Tidak ada konten yang di-assign untuk Anda.</div>';
+    return;
+  }
+
+  let html = info +
+    '<table>' +
+    '<thead>' +
+      '<tr>' +
+        '<th>Download</th>' +
+        '<th>#</th>' +
+        '<th>Pengembang</th>' +
+        '<th>Fase</th>' +
+        '<th>Mapel</th>' +
+        '<th>Judul</th>' +
+        '<th>Aksi</th>' +
+      '</tr>' +
+    '</thead>' +
+    '<tbody>';
+
+  payload.items.forEach(function(it, idx){
+    html += '<tr>';
+
+    // ===== KOLOM DOWNLOAD =====
+    const dl = it.download ? String(it.download).trim() : '';
+    if (dl && dl.toLowerCase().startsWith('http')) {
+      html +=
+        '<td>' +
+          '<a href="'+escapeHtml(dl)+'" target="_blank" rel="noopener" class="btn btn-small">' +
+            'Download' +
+          '</a>' +
+        '</td>';
+    } else if (dl) {
+      html +=
+        '<td>' +
+          '<span class="muted" title="'+escapeHtml(dl)+'">' +
+            escapeHtml(dl.length > 25 ? dl.slice(0,25)+'…' : dl) +
+          '</span>' +
+        '</td>';
+    } else {
+      html += '<td>-</td>';
+    }
+
+    html +=
+      '<td>'+(idx+1)+'</td>' +
+      '<td>'+escapeHtml(it.pengembang)+'</td>' +
+      '<td>'+escapeHtml(it.fase)+'</td>' +
+      '<td>'+escapeHtml(it.mapel)+'</td>' +
+      '<td>'+escapeHtml(it.judul)+'</td>';
+
+    const sudah = it.alreadyCuratedBy && it.alreadyCuratedBy.trim() !== '';
+    if(sudah){
+      html +=
+        '<td><button class="btn btn-small" disabled>Sudah dikurasi</button></td>';
+    } else {
+      html +=
+        '<td>' +
+          '<button class="btn btn-small btn-success" ' +
+            'onclick="openKurasi('+it.row+', \''+encodeURIComponent(payload.kurator)+'\')">' +
+            'Kurasi' +
+          '</button>' +
+        '</td>';
+    }
+
+    html += '</tr>';
+  });
+
+  html += '</tbody></table>';
+
+  document.getElementById('listArea').innerHTML = html;
+}
+
+
+/* -------------------- OPEN FORM -------------------- */
+async function openKurasi(row,kurEnc){
+  const kur=decodeURIComponent(kurEnc);
+  const panel=document.getElementById('kurasiPanel');
+  panel.classList.remove('hidden');
+  panel.innerHTML='Memuat form...';
+  const res=await fetch(API_URL+`?action=payload&row=${row}&kurator=${encodeURIComponent(kur)}`);
+  const payload=await res.json();
+  renderKurasiForm(payload);
+}
+
+/* -------------------- FORM KURASI (gabungan kurasi.html) -------------------- */
+function renderKurasiForm(p){
+  const panel=document.getElementById('kurasiPanel');
+  panel.innerHTML='';
+  const c=document.createElement('div');
+  c.innerHTML=`<h3>Kurator ${escapeHtml(p.kurator)}</h3>
+  <div class="muted">${escapeHtml(p.sumberJudul)}</div>`;
+  p.questions.forEach((q,i)=>{
+    c.innerHTML+=`
+      <div class="question">
+        <label>${i+1}. ${escapeHtml(q)}</label>
+        <select id="q${i}"><option></option><option>Ya</option><option>Tidak</option></select>
+        <textarea id="n${i}" rows="2" placeholder="Catatan"></textarea>
+      </div>`;
+  });
+  c.innerHTML+=`
+    <textarea id="komentar" rows="3" placeholder="Komentar umum"></textarea>
+    <div class="form-actions">
+      <button class="btn-cancel" onclick="panel.classList.add('hidden')">Batal</button>
+      <button class="btn-success" onclick="submitKurasi(${p.row},'${escapeHtml(p.kurator)}',${p.questions.length})">Kirim</button>
+    </div>`;
+  panel.appendChild(c);
+}
+
+/* -------------------- SUBMIT -------------------- */
+async function submitKurasi(row, kurator, qCount){
+  try {
+    const answers = [];
+    const notes = [];
+
+    for(let i = 0; i < qCount; i++){
+      const sel = document.getElementById('q' + i);
+      const ta  = document.getElementById('n' + i);
+
+      answers.push(sel ? sel.value : '');
+      notes.push(ta ? ta.value : '');
+    }
+
+    const komentarEl = document.getElementById('komentar');
+    const komentar = komentarEl ? komentarEl.value : '';
+
+    const payload = {
+      row: row,
+      kurator: kurator,
+      answers: answers,
+      notes: notes,
+      komentar: komentar
+    };
+
+    console.log('Payload dikirim:', payload);
+
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      mode: 'cors',
+      redirect: 'follow',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify({
+        action: 'submitKurasi',
+        payload: payload
+      })
+    });
+
+
+    if (!res.ok) {
+      throw new Error('HTTP error ' + res.status);
+    }
+
+    const result = await res.json();
+    console.log('Response server:', result);
+
+    if (result.error) {
+      throw new Error(result.error);
+    }
+
+    // ===== FEEDBACK SUKSES KE USER =====
+    document.getElementById('kurasiPanel').innerHTML =
+      '<div class="alert alert-success" style="text-align:center">' +
+        '✅ <strong>Berhasil!</strong><br>' +
+        'Hasil kurasi telah disimpan di baris ke-' + result.row +
+      '</div>';
+
+    // refresh daftar konten
+    setTimeout(() => {
+      document.getElementById('kurasiPanel').classList.add('hidden');
+      document.getElementById('btnLoad').click();
+    }, 1500);
+
+  } catch (err) {
+    console.error('Gagal submit:', err);
+
+    document.getElementById('kurasiPanel').innerHTML =
+      '<div class="alert alert-error" style="text-align:center">' +
+        '❌ <strong>Gagal menyimpan</strong><br>' +
+        err.message +
+      '</div>';
+  }
+}
+
+/* -------------------- INIT -------------------- */
+loadKurators();
+btnHasil.onclick=()=>window.open('hasil.html','_blank');
+</script>
+
+</body>
+</html>
