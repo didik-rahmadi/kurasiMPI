@@ -45,32 +45,73 @@ function loadCreators(){
     });
 }
 
-function loadContents(){
-  const c = creator.value;
-  if(!c) return;
+function loadContents() {
+  const creator = document.getElementById('creator').value;
+  if (!creator) {
+    alert('Silakan pilih kreator terlebih dahulu');
+    return;
+  }
 
-  fetch(API_URL+'?action=contents&creator='+encodeURIComponent(c))
-    .then(r=>r.json())
-    .then(d=>{
-      contentList.innerHTML = d.map(it=>`
-        <div class="content-item" onclick="loadDetail(${it.rowNumber})">
-          <b>${it.identitas.E}</b><br>
-          ${it.identitas.F} | ${it.identitas.G}
+  const listDiv = document.getElementById('contentList');
+  const detailDiv = document.getElementById('detail');
+
+  listDiv.innerHTML = 'Memuat hasil kurasi...';
+  detailDiv.innerHTML = '';
+
+  fetch(API_URL + '?action=hasil&kurator=' + encodeURIComponent(creator))
+    .then(r => r.json())
+    .then(data => {
+      if (!data.rows || data.rows.length === 0) {
+        listDiv.innerHTML = '<div class="muted">Belum ada hasil kurasi.</div>';
+        return;
+      }
+
+      listDiv.innerHTML = data.rows.map((r, i) => `
+        <div class="content-item" onclick="loadDetail(${i})">
+          <b>${r[6]}</b><br>
+          <small>Mapel: ${r[5]}</small>
         </div>
       `).join('');
+
+      // simpan cache global untuk detail
+      window.__HASIL_CACHE__ = data;
+    })
+    .catch(err => {
+      listDiv.innerHTML = '<div class="muted">Gagal memuat data</div>';
+      console.error(err);
     });
 }
 
-function loadDetail(row){
-  fetch(API_URL+'?action=detail&row='+row)
-    .then(r=>r.json())
-    .then(d=>{
-      detail.innerHTML = d.qa.map(q=>`
-        <p><b>${q.pertanyaan}</b></p>
-        <div>${q.jawaban.join('<br>')}</div>
-      `).join('');
-    });
+
+function loadDetail(index) {
+  const data = window.__HASIL_CACHE__;
+  if (!data) return;
+
+  const headers = data.headers;
+  const row = data.rows[index];
+
+  let html = `
+    <div class="card">
+      <p><b>Judul:</b> ${row[6]}</p>
+      <p><b>Pengembang:</b> ${row[3]}</p>
+      <p><b>Mapel:</b> ${row[5]}</p>
+      <hr>
+  `;
+
+  for (let i = 7; i < headers.length - 1; i += 2) {
+    html += `
+      <p><b>${headers[i]}</b></p>
+      <div class="jawaban">
+        <p>• ${row[i]}</p>
+        <p>• ${row[i + 1]}</p>
+      </div>
+    `;
+  }
+
+  html += `<hr><p><b>Komentar:</b><br>${row[headers.length - 1]}</p></div>`;
+  document.getElementById('detail').innerHTML = html;
 }
+
 
 loadCreators();
 </script>
