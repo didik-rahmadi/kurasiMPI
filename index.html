@@ -128,6 +128,13 @@ function openKurasi(row,kurEnc){
           </select>
           <textarea id="n${i}" rows="2"></textarea>
         `;
+        h += `
+          <hr>
+          <p><b>Komentar Umum / Kesimpulan Akhir</b></p>
+          <textarea id="komentar" rows="4"
+            placeholder="Tuliskan kesimpulan atau komentar umum atas konten ini..."></textarea>
+        `;
+
       });
 
       h+=`<button class="btn btn-success"
@@ -152,7 +159,14 @@ function submitKurasi(row,kur,qc){
     headers:{'Content-Type':'text/plain;charset=utf-8'},
     body:JSON.stringify({
       action:'submitKurasi',
-      payload:{row,kurator:kur,answers:a,notes:n}
+      payload:{
+        row,
+        kurator: kur,
+        answers: a,
+        notes: n,
+        komentar: document.getElementById('komentar')?.value || ''
+      }
+
     })
   }).then(()=>{
     alert('Hasil kurasi tersimpan');
