@@ -43,129 +43,160 @@
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbxUlZ3SfTJY-WIDgMrjQAzVfl8aUPNBak3zvOfcLGLuOSNauo4Mjq85qWH6j3Ab6d916A/exec";
 
-/* Escaper Utility */
+/* UTIL */
 function esc(s){
-  return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  return String(s||'').replace(/[&<>"']/g,m=>(
+    {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]
+  ));
 }
 
+/* LOAD CREATOR */
 function loadCreators(){
   fetch(API_URL+'?action=creators')
     .then(r=>r.json())
-    .then(d=>{
+    .then(list=>{
       const sel = document.getElementById('creator');
-      sel.innerHTML='<option value="">-- Pilih Pengembang --</option>';
-      d.forEach(n => sel.innerHTML+=`<option>${esc(n)}</option>`);
+      sel.innerHTML = '<option value="">-- Pilih Pengembang --</option>';
+      list.forEach(n=>{
+        sel.innerHTML += `<option>${esc(n)}</option>`;
+      });
     });
 }
 
-function loadContents() {
+/* LOAD CONTENTS + STATUS */
+function loadContents(){
   const creator = document.getElementById('creator').value;
-  if (!creator) {
-    alert('Silakan pilih kreator terlebih dahulu');
-    return;
-  }
+  if(!creator) return alert('Pilih pengembang terlebih dahulu');
 
-  const listDiv = document.getElementById('contentList');
-  const detailDiv = document.getElementById('detail');
-  
-  detailDiv.innerHTML = '';
-  detailDiv.classList.add('hidden');
-  listDiv.innerHTML = '<div class="loader"></div><div style="text-align:center">Mengambil data...</div>';
+  const list = document.getElementById('contentList');
+  const detail = document.getElementById('detail');
+  detail.classList.add('hidden');
+  detail.innerHTML = '';
+  list.innerHTML = '<div class="muted" style="text-align:center">Memuat data...</div>';
 
-  fetch(API_URL + '?action=hasil&kurator=' + encodeURIComponent(creator))
-    .then(r => r.json())
-    .then(data => {
-      if (!data.rows || data.rows.length === 0) {
-        listDiv.innerHTML = '<div class="muted" style="text-align:center">Belum ada hasil kurasi dari kurator ini.</div>';
-        return;
-      }
+  Promise.all([
+    fetch(API_URL+'?action=allContents').then(r=>r.json()),
+    fetch(API_URL+'?action=hasil&kurator='+encodeURIComponent(creator)).then(r=>r.json())
+  ])
+  .then(([allData, hasilData])=>{
 
-      // Render List
-      listDiv.innerHTML = data.rows.map((r, i) => `
-        <div class="content-item" onclick="loadDetail(${i})">
-          <div style="font-weight:bold; font-size:16px; margin-bottom:4px;">${esc(r[6])}</div>
-          <div style="font-size:13px; color:#555;">
-             <span class="tag" style="background:#e0f2fe; color:#0284c7; padding:2px 8px; border-radius:4px;">Fase ${esc(r[4])}</span> 
-             &nbsp; ${esc(r[5])}
-          </div>
-          <small style="display:block; margin-top:6px; color:#888;">Kurator: ${esc(r[1])}</small>
-        </div>
-      `).join('');
-
-      // Simpan cache global
-      window.__HASIL_CACHE__ = data;
-    })
-    .catch(err => {
-      listDiv.innerHTML = '<div class="muted">Gagal memuat data. Periksa koneksi internet.</div>';
-      console.error(err);
+    const hasilMap = {};
+    (hasilData.rows||[]).forEach(r=>{
+      hasilMap[r[6]] = r; // key by Judul
     });
+
+    let html = '';
+
+    allData.forEach(it=>{
+      if(it.pengembang !== creator) return;
+
+      const sudah = it.status === true;
+      const rowHasil = hasilMap[it.judul]; // dari HasilKurasi
+      const namaKurator = rowHasil ? rowHasil[1] : '-';
+
+      html += `
+        <div class="content-item ${sudah?'done':'pending'}"
+          ${sudah?`onclick="showDetail('${esc(it.judul)}')"`:''}>
+          
+          <div style="font-weight:700;font-size:16px;">
+            ${esc(it.judul)}
+          </div>
+
+          <div style="font-size:13px;margin-top:4px;">
+            Fase ${esc(it.fase)} • ${esc(it.mapel)}
+          </div>
+
+          <!-- ✅ BARIS INI DIKEMBALIKAN -->
+          <small style="display:block;margin-top:6px;color:#64748b;">
+            Kurator: <b>${esc(it.kurator || '-')}</b>
+          </small>
+
+          <small style="display:block;margin-top:2px;">
+            Status:
+            <b>${sudah?'Sudah Dikurasi':'Belum Dikurasi'}</b>
+          </small>
+        </div>
+      `;
+
+    });
+
+    list.innerHTML = html || '<div class="muted" style="text-align:center">Tidak ada konten.</div>';
+    window.__HASIL_CACHE__ = hasilData;
+  })
+  .catch(err=>{
+    console.error(err);
+    list.innerHTML = '<div class="muted">Gagal memuat data.</div>';
+  });
 }
 
-
-function loadDetail(index) {
+/* SHOW DETAIL */
+function showDetail(judul){
   const data = window.__HASIL_CACHE__;
-  if (!data) return;
+  if(!data) return;
+
+  const idx = data.rows.findIndex(r=>r[6]===judul);
+  if(idx<0) return;
 
   const headers = data.headers;
-  const row = data.rows[index];
-  const detailDiv = document.getElementById('detail');
+  const row = data.rows[idx];
+  const d = document.getElementById('detail');
 
   let html = `
-    <h3 style="margin-top:0; border-bottom:1px solid #ddd; padding-bottom:10px;">Detail Kurasi</h3>
-    <table style="margin-bottom:20px;">
-      <tr><td width="120"><b>Judul</b></td><td>: ${esc(row[6])}</td></tr>
+    <h3>Detail Kurasi</h3>
+    <table style="margin-bottom:15px">
+      <tr><td><b>Judul</b></td><td>: ${esc(row[6])}</td></tr>
       <tr><td><b>Pengembang</b></td><td>: ${esc(row[3])}</td></tr>
       <tr><td><b>Fase / Mapel</b></td><td>: ${esc(row[4])} / ${esc(row[5])}</td></tr>
       <tr><td><b>Kurator</b></td><td>: ${esc(row[1])}</td></tr>
     </table>
-    
-    <div style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #e2e8f0;">
+
+    <div style="background:#f8fafc;padding:15px;border-radius:8px;border:1px solid #e2e8f0">
   `;
 
-  // Loop kolom pertanyaan (Asumsi: Kolom 7 sampai sebelum kolom terakhir adalah pertanyaan)
-  // Logic: Kolom Ganjil = Jawaban (Ya/Tidak), Kolom Genap = Catatan
-  for (let i = 7; i < headers.length - 1; i += 2) {
-    const pertanyaaan = headers[i];
-    const jawaban = row[i];
-    const catatan = row[i+1];
+  for(let i=7;i<headers.length-1;i+=2){
+    const q = headers[i];
+    const j = row[i];
+    const n = row[i+1];
 
-    // Warna badge jawaban
-    let badgeColor = (jawaban === 'Ya') ? 'background:#dcfce7; color:#166534;' : 'background:#fee2e2; color:#991b1b;';
-    if(!jawaban) badgeColor = 'background:#f3f4f6; color:#666;';
+    const badge =
+      j==='Ya' ? 'background:#dcfce7;color:#166534;' :
+      j==='Tidak' ? 'background:#fee2e2;color:#991b1b;' :
+      'background:#f3f4f6;color:#555;';
 
     html += `
-      <div class="detail-answer-block">
-        <p style="margin-bottom:6px; font-weight:600; color:#334155;">${esc(pertanyaaan)}</p>
-        <div style="display:flex; gap:10px; align-items:flex-start;">
-           <span style="${badgeColor} padding:4px 10px; border-radius:6px; font-size:13px; font-weight:bold; min-width:60px; text-align:center;">
-             ${esc(jawaban) || '-'}
-           </span>
-           <span style="font-size:14px; color:#475569; font-style:italic;">
-             ${catatan ? 'Catatan: '+esc(catatan) : ''}
-           </span>
+      <div style="margin-bottom:12px">
+        <div style="font-weight:600">${esc(q)}</div>
+        <div style="display:flex;gap:10px;margin-top:4px">
+          <span style="${badge}padding:4px 10px;border-radius:6px;font-weight:bold">
+            ${esc(j)||'-'}
+          </span>
+          <span style="font-style:italic;color:#475569">
+            ${n?esc(n):''}
+          </span>
         </div>
       </div>
     `;
   }
 
-  // Komentar Akhir (Kolom Terakhir)
-  const komentarAkhir = row[headers.length - 1];
-  html += `</div>
-    <div style="margin-top:20px; background:#fff7ed; padding:15px; border-radius:8px; border:1px solid #fdba74;">
-      <b style="color:#9a3412;">Kesimpulan / Komentar Akhir:</b>
-      <p style="margin-top:5px;">${esc(komentarAkhir) || '-'}</p>
+  html += `
     </div>
-    
-    <button class="btn btn-secondary" style="margin-top:20px; width:100%;" onclick="document.getElementById('detail').classList.add('hidden'); window.scrollTo(0,0);">
+    <div style="margin-top:15px;background:#fff7ed;padding:15px;border-radius:8px;border:1px solid #fdba74">
+      <b>Kesimpulan / Komentar Akhir</b>
+      <p>${esc(row[headers.length-1])||'-'}</p>
+    </div>
+
+    <button class="btn btn-secondary" style="margin-top:15px;width:100%"
+      onclick="d.classList.add('hidden');window.scrollTo(0,0)">
       Tutup Detail
     </button>
   `;
 
-  detailDiv.innerHTML = html;
-  detailDiv.classList.remove('hidden');
-  detailDiv.scrollIntoView({ behavior: 'smooth' });
+  d.innerHTML = html;
+  d.classList.remove('hidden');
+  d.scrollIntoView({behavior:'smooth'});
 }
 
+/* INIT */
 loadCreators();
 </script>
 </body>
