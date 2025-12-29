@@ -274,3 +274,15 @@ textarea#komentar {
   .controls { flex-direction: column; }
   select, .btn { width: 100%; }
 }
+
+.content-item.done{
+  background:#ecfdf5;
+  border:1px solid #34d399;
+}
+
+.content-item.pending{
+  background:#fef2f2;
+  border:1px solid #f87171;
+  cursor:not-allowed;
+  opacity:.9;
+}
